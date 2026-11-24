@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">
+  <title>Aurea OS intended architecture</title>
+  <defs>
+    <style>
+      .goal { fill: #eef1fb; stroke: #4a5fb0; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .core { fill: #e6e9f8; stroke: #2e3f8f; stroke-width: 2; }
+      .band { fill: #ffffff; stroke: #c9c9d2; stroke-width: 1; }
+      .h    { font-weight: 600; font-size: 14px; fill: #1d1d26; }
+      .t    { fill: #2b2b36; }
+      .s    { fill: #5b5b68; font-size: 11.5px; }
+      .lbl  { font-weight: 600; font-size: 12px; fill: #6a6a78; letter-spacing: 0.06em; }
+      .arr  { stroke: #6a6a78; stroke-width: 1.3; fill: none; marker-end: url(#a); }
+    </style>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6a6a78"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="960" height="600" fill="#fafafc"/>
+  <text x="24" y="34" class="h" font-size="18">Intended architecture — design direction, not current state</text>
+  <text x="24" y="54" class="s">Everything on this page is planned or under construction. See the Milestone 1 diagram for what exists today.</text>
+
+  <rect x="24" y="72" width="912" height="128" rx="8" class="band"/>
+  <text x="40" y="94" class="lbl">RING 3 · APPLICATIONS AND RUNTIMES</text>
+  <rect x="40" y="106" width="200" height="80" rx="6" class="goal"/>
+  <text x="52" y="128" class="t">Native Aurea apps</text>
+  <text x="52" y="146" class="s">Public SDK and APA</text>
+  <text x="52" y="162" class="s">interfaces</text>
+  <rect x="252" y="106" width="216" height="80" rx="6" class="goal"/>
+  <text x="264" y="128" class="t">Windows app runtime</text>
+  <text x="264" y="146" class="s">Windows-style paths mapped</text>
+  <text x="264" y="162" class="s">onto AureaFS</text>
+  <rect x="480" y="106" width="216" height="80" rx="6" class="goal"/>
+  <text x="492" y="128" class="t">Linux app runtime</text>
+  <text x="492" y="146" class="s">Linux file view mapped</text>
+  <text x="492" y="162" class="s">onto AureaFS</text>
+  <rect x="708" y="106" width="212" height="80" rx="6" class="goal"/>
+  <text x="720" y="128" class="t">Android app runtime</text>
+  <text x="720" y="146" class="s">Isolated environment</text>
+  <text x="720" y="162" class="s">managed by Aurea</text>
+
+  <rect x="24" y="214" width="912" height="72" rx="8" class="band"/>
+  <text x="40" y="236" class="lbl">USER-MODE SYSTEM SERVICES</text>
+  <text x="40" y="264" class="t">Horizon, Aura, session, package and configuration services — through the same validated system interfaces as apps</text>
+
+  <rect x="24" y="300" width="604" height="160" rx="8" class="core"/>
+  <text x="40" y="324" class="lbl" fill="#2e3f8f">RING 0 · ZERO CORE (FINAL AUTHORITY)</text>
+  <text x="40" y="350" class="t">Processes, scheduling, memory isolation, handles and permissions</text>
+  <text x="40" y="372" class="t">Syscall validation for every runtime</text>
+  <text x="40" y="394" class="t">AGA: graphics authority and shared GPU management</text>
+  <text x="40" y="416" class="t">AureaFS: the authoritative store for user data</text>
+  <text x="40" y="438" class="t">Device ownership, leases and recovery decisions</text>
+
+  <rect x="644" y="300" width="292" height="160" rx="8" class="goal"/>
+  <text x="660" y="324" class="lbl">LINUX DRIVER DOMAIN</text>
+  <text x="660" y="350" class="t">Linux kernel in an isolated VM</text>
+  <text x="660" y="372" class="s">Supplies hardware drivers through</text>
+  <text x="660" y="388" class="s">controlled device interfaces.</text>
+  <text x="660" y="410" class="s">A driver failure restarts the domain,</text>
+  <text x="660" y="426" class="s">not the operating system.</text>
+  <path d="M 644 380 L 632 380" class="arr"/>
+  <path d="M 628 396 L 640 396" class="arr"/>
+
+  <rect x="24" y="474" width="912" height="48" rx="8" fill="#ececf1" stroke="#c9c9d2"/>
+  <text x="40" y="503" class="t">Hardware: CPU, memory, storage, GPU, USB, network — assigned by Zero Core, never owned outright by a runtime</text>
+
+  <text x="24" y="556" class="s">Linux is a driver provider inside a boundary that Zero Core controls. It does not replace Zero Core as the primary kernel.</text>
+  <text x="24" y="576" class="s">Runtimes see a compatible filesystem view; AureaFS stays the single source of truth for stored data.</text>
+</svg>

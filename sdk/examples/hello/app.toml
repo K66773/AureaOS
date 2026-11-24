@@ -1,0 +1,30 @@
+application_id = "dev.example.hello"
+display_name = "Hello"
+version = "1.0.0"
+author = "Example"
+description = "Prints a greeting, its PID and its arguments"
+architecture = "x86_64"
+runtime = "aurea-native"
+aurea_api_version = "0.1"
+aurea_abi_version = 1
+entry = "0x400000"
+application_role = "user"
+
+[limits]
+memory_bytes = 16777216
+max_threads = 1
+max_windows = 0
+max_handles = 16
+cpu_priority = 3
+
+[permissions]
+system_info = true
+console_write = true
+window_create = false
+filesystem_read = false
+filesystem_write = false
+network_connect = false
+device_query = false
+device_access = false
+process_spawn = false
+kernel_access = false

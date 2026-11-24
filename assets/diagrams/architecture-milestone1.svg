@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">
+  <title>Aurea OS Milestone 1 architecture (build 02416)</title>
+  <defs>
+    <style>
+      .ok   { fill: #e8f3ec; stroke: #2f7d4f; stroke-width: 1.5; }
+      .part { fill: #fdf3e1; stroke: #b7791f; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .off  { fill: #f2f2f4; stroke: #8a8a96; stroke-width: 1.2; stroke-dasharray: 2 4; }
+      .band { fill: #ffffff; stroke: #c9c9d2; stroke-width: 1; }
+      .h    { font-weight: 600; font-size: 14px; fill: #1d1d26; }
+      .t    { fill: #2b2b36; }
+      .s    { fill: #5b5b68; font-size: 11.5px; }
+      .lbl  { font-weight: 600; font-size: 12px; fill: #6a6a78; letter-spacing: 0.06em; }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="960" height="640" fill="#fafafc"/>
+  <text x="24" y="34" class="h" font-size="18">Milestone 1 — what build 02416 contains</text>
+  <text x="24" y="54" class="s">Verified in QEMU 11 on Windows (WHPX, 1 vCPU) unless noted. Not a target diagram.</text>
+
+  <!-- Ring 3 -->
+  <rect x="24" y="72" width="912" height="92" rx="8" class="band"/>
+  <text x="40" y="94" class="lbl">RING 3 · USER MODE</text>
+  <rect x="40" y="104" width="420" height="48" rx="6" class="part"/>
+  <text x="52" y="124" class="t">Native applications (.aex / .run, SDK ABI v1)</text>
+  <text x="52" y="142" class="s">Run in CPL 3; console and arguments verified, rest untested</text>
+  <rect x="476" y="104" width="444" height="48" rx="6" class="off"/>
+  <text x="488" y="124" class="t">Compatibility runtimes (Windows, Linux, Android apps)</text>
+  <text x="488" y="142" class="s">Not present in Milestone 1</text>
+
+  <!-- Kernel-hosted system -->
+  <rect x="24" y="176" width="912" height="214" rx="8" class="band"/>
+  <text x="40" y="198" class="lbl">RING 0 · ZERO CORE AND KERNEL-HOSTED SYSTEM</text>
+
+  <rect x="40" y="208" width="280" height="68" rx="6" class="ok"/>
+  <text x="52" y="228" class="t">Horizon desktop</text>
+  <text x="52" y="246" class="s">Explorer, Settings, Task Manager,</text>
+  <text x="52" y="262" class="s">Error Center, Device Manager</text>
+
+  <rect x="336" y="208" width="280" height="68" rx="6" class="ok"/>
+  <text x="348" y="228" class="t">Aura terminal and command registry</text>
+  <text x="348" y="246" class="s">163 registered commands</text>
+  <text x="348" y="262" class="s">Hello login and sessions</text>
+
+  <rect x="632" y="208" width="288" height="68" rx="6" class="part"/>
+  <text x="644" y="228" class="t">Linux driver domain (VMX guest)</text>
+  <text x="644" y="246" class="s">Linux 6.18.49, GNU Bash, BusyBox</text>
+  <text x="644" y="262" class="s">Needs VT-x + EPT; unavailable under WHPX</text>
+
+  <rect x="40" y="288" width="186" height="88" rx="6" class="ok"/>
+  <text x="52" y="308" class="t">Scheduler, memory,</text>
+  <text x="52" y="324" class="t">paging, syscalls</text>
+  <text x="52" y="344" class="s">One CPU in the</text>
+  <text x="52" y="360" class="s">shipped config</text>
+
+  <rect x="238" y="288" width="186" height="88" rx="6" class="ok"/>
+  <text x="250" y="308" class="t">VFS, C: drive</text>
+  <text x="250" y="328" class="s">RAM-backed in the</text>
+  <text x="250" y="344" class="s">release image;</text>
+  <text x="250" y="360" class="s">lost at shutdown</text>
+
+  <rect x="436" y="288" width="186" height="88" rx="6" class="off"/>
+  <text x="448" y="308" class="t">AureaFS</text>
+  <text x="448" y="328" class="s">Implemented, but not</text>
+  <text x="448" y="344" class="s">mounted by the</text>
+  <text x="448" y="360" class="s">release image</text>
+
+  <rect x="634" y="288" width="140" height="88" rx="6" class="off"/>
+  <text x="646" y="308" class="t">SoftCPU</text>
+  <text x="646" y="328" class="s">Development</text>
+  <text x="646" y="344" class="s">builds only; not</text>
+  <text x="646" y="360" class="s">in this image</text>
+
+  <rect x="786" y="288" width="134" height="88" rx="6" class="part"/>
+  <text x="798" y="308" class="t">SMP</text>
+  <text x="798" y="328" class="s">Code present;</text>
+  <text x="798" y="344" class="s">not verified for</text>
+  <text x="798" y="360" class="s">this release</text>
+
+  <!-- Drivers -->
+  <rect x="24" y="402" width="912" height="122" rx="8" class="band"/>
+  <text x="40" y="424" class="lbl">NATIVE DRIVERS</text>
+  <rect x="40" y="434" width="216" height="76" rx="6" class="ok"/>
+  <text x="52" y="454" class="t">Display and input</text>
+  <text x="52" y="472" class="s">UEFI GOP / virtio-vga,</text>
+  <text x="52" y="488" class="s">PS/2 keyboard, USB tablet</text>
+  <rect x="268" y="434" width="216" height="76" rx="6" class="part"/>
+  <text x="280" y="454" class="t">USB</text>
+  <text x="280" y="472" class="s">UHCI and xHCI; HID and</text>
+  <text x="280" y="488" class="s">mass storage (detection)</text>
+  <rect x="496" y="434" width="200" height="76" rx="6" class="part"/>
+  <text x="508" y="454" class="t">Network</text>
+  <text x="508" y="472" class="s">Intel e1000, DHCP,</text>
+  <text x="508" y="488" class="s">HTTP download</text>
+  <rect x="708" y="434" width="212" height="76" rx="6" class="part"/>
+  <text x="720" y="454" class="t">Storage controllers</text>
+  <text x="720" y="472" class="s">AHCI not verified here;</text>
+  <text x="720" y="488" class="s">NVMe detection only</text>
+
+  <!-- Hardware -->
+  <rect x="24" y="536" width="912" height="44" rx="8" fill="#ececf1" stroke="#c9c9d2"/>
+  <text x="40" y="563" class="t">x86-64 PC with UEFI firmware · QEMU (recommended) · real hardware experimental</text>
+
+  <!-- Legend -->
+  <rect x="24" y="598" width="20" height="14" rx="3" class="ok"/>
+  <text x="52" y="610" class="s">Works in the release build</text>
+  <rect x="244" y="598" width="20" height="14" rx="3" class="part"/>
+  <text x="272" y="610" class="s">Partial, experimental or conditional</text>
+  <rect x="524" y="598" width="20" height="14" rx="3" class="off"/>
+  <text x="552" y="610" class="s">Not available in this release</text>
+</svg>
