@@ -38,7 +38,7 @@ Download from the [Milestone 1 release](../../releases/tag/milestone-1): `AureaO
 
 | Environment | Aurea desktop | Linux guest and Bash |
 |---|---|---|
-| Intel PC, VT-x + EPT | Experimental. Verified on an HP EliteBook 840 G8 | Verified on that machine with build 02412 |
+| Intel PC, VT-x + EPT | Experimental | Verified on that machine with build 02412 |
 | QEMU/KVM on Linux, nested VMX | Works | Verified with build 02416 |
 | QEMU/WHPX on Windows | Works | Not available: WHPX does not pass the required VMX features to the guest |
 | AMD processors | Not tested | Not supported (no AMD SVM backend) |
