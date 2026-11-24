@@ -56,7 +56,7 @@ Native drivers exist for: the UEFI framebuffer, PS/2 keyboard, USB UHCI and xHCI
 
 ## SMP
 
-The release configuration starts one CPU. SMP code exists, but multi-CPU operation was not verified for build 02416.
+The release configuration starts one CPU (`boot.cores=1`). With `boot.cores=all`, build 02416 ran on four virtual CPUs in QEMU (WHPX and KVM), including native programs and the Linux guest, in sessions of a few minutes. Multi-core operation has not been tested on hardware or in long runs.
 
 ## SoftCPU
 
@@ -79,7 +79,7 @@ Milestone 1 is not a hardened operating system. Do not store sensitive data in i
 | Ring 0 / Ring 3 separation | Exists for external applications. The desktop and system applications run in Ring 0. |
 | Memory isolation | Per-process address spaces and NX for user stacks. Protection of kernel memory from user code has not been systematically tested. |
 | Process permissions | Processes have roles, integrity levels and protection flags; system processes cannot be ended from Task Manager. Not audited. |
-| Accounts | The development account `Aura` is an administrator, with a public password (`root`). |
+| Accounts | The development account `aura` is an administrator, with a public password (`root`). |
 | Password storage | Salted SHA-256, a single iteration. Not a password-hashing function such as Argon2 or bcrypt. |
 | File system permissions | Minimal. The RAM file system is not a security boundary. |
 | Encryption | None. No storage encryption. |

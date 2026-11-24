@@ -104,16 +104,28 @@ The serial log is verbose in Milestone 1: the shipped configuration logs at trac
 
 ## Using Aurea in the VM
 
-- The login screen appears after roughly 30–40 seconds with acceleration. Log in as **`Aura`**, password **`root`**.
+- The login screen appears after roughly 30–40 seconds with acceleration. Log in as **`aura`**, password **`root`**.
 - The keyboard behaves as a **German QWERTZ** keyboard regardless of your host layout, because QEMU passes physical key positions. On a US keyboard, Y and Z are swapped and symbols sit in different places. `keyboard layout set ENG` in the Aura terminal switches Aurea to US QWERTY until the next boot.
 - Click inside the window to give it keyboard focus. If QEMU grabs the mouse, Ctrl+Alt+G releases it.
 - To stop the VM, run `power shutdown` in the Aura terminal or close the QEMU window. Nothing is saved either way. Under KVM, `power shutdown` did not turn the VM off in one test; close the window in that case.
 
 ## CPU count and SMP
 
-The release image starts **one CPU**, even if QEMU provides more: its `boot.config` contains `boot.cores=1`. Aurea has SMP code (AP start-up, per-CPU structures, scheduler support), but multi-CPU operation has not been verified for this build, so the release keeps it off.
+The release image starts **one CPU**, even if QEMU provides more: `boot.config` on the image contains `boot.cores=1`. I kept that default because multi-core operation has not been tested on hardware yet.
 
-To experiment anyway, change `boot.cores=1` to `boot.cores=all` in `boot.config` on the image's EFI partition, and start the VM with `-Cpus 2` (Windows launcher) or `-smp 2`. Treat any result as experimental.
+Four cores do work in QEMU with build 02416. With `boot.cores=all` and four virtual CPUs, all four came online and were scheduled, Task Manager showed live per-core load, native programs ran, and under KVM the Linux guest started and Bash worked. I tested this under WHPX and KVM for a few minutes at a time, not in long runs.
+
+To try it, change the setting in the image's EFI partition. With mtools (Linux or WSL):
+
+```sh
+for f in boot.config Aurea/boot.config simply.config; do
+  mcopy -n -i AureaOS-Milestone1-build02416.img@@1M ::/$f cfg && \
+  sed -i 's/^boot.cores=1/boot.cores=all/' cfg && \
+  mcopy -o -i AureaOS-Milestone1-build02416.img@@1M cfg ::/$f
+done
+```
+
+Then start the VM with `"Aurea Live VM.cmd" -Cpus 4` or `-smp 4`. Changing the image changes its checksum, so the launcher will report a mismatch with `SHA256SUMS.txt`; keep a copy of the original.
 
 ## VirtualBox and other hypervisors
 

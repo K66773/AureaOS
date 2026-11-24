@@ -13,7 +13,7 @@ This reference covers build 02416. Status values:
 - Paths use drive letters, for example `C:/Temp/file.txt`. Aura prints paths with backslashes (`C:\Temp\file.txt`). The prompt shows the current directory: `Aura C:/>`.
 - `history` lists the commands entered in this session.
 - The keyboard follows the German QWERTZ layout unless you run `keyboard layout set ENG`.
-- Each command has a required permission level. The development account `Aura` is an administrator.
+- Each command has a required permission level. The development account `aura` is an administrator.
 
 ## Aura commands and Bash commands
 
@@ -35,6 +35,8 @@ Bash needs VT-x with EPT and is not available in Windows QEMU.
 | Command | Purpose | Syntax | Status | Notes |
 |---|---|---|---|---|
 | `help` | Show command help | `help [command\|category]` | Verified | Lists categories and usage. |
+| `aurea` | System information | `aurea -info` | Verified | `aurea -info` and `aurea --info` print system and hardware information. |
+| `smp` | Symmetric multiprocessing | `smp status \| smp selftest \| smp timers \| smp idle \| smp start \| smp test \| smp context-cert [short\|scale\|full] \| smp inject-mask <cpu>` | Verified | `smp status` verified with one and with four CPUs. |
 | `commands` | List registered commands | `commands [--all] [category]` | Registered |  |
 | `clear` | Clear the screen | `clear` | Verified |  |
 | `echo` | Print text | `echo <text...>` | Verified |  |
@@ -96,7 +98,7 @@ Every command registered in build 02416, grouped as `help` groups them. *Registe
 | Command | Purpose | Usage | Status |
 |---|---|---|---|
 | `app` | Application management | `app <list\|running\|info\|start\|stop> ...` | Verified |
-| `aurea` | System information | `aurea -info` | Registered |
+| `aurea` | System information | `aurea -info` | Verified |
 | `container` | Classify/inspect AEX/RUN | `container classify\|inspect <path>` | Registered |
 | `devmgr` | Device Manager | `devmgr` | Registered |
 | `devmgr.run` | Start Device Manager | `devmgr.run` | Registered |
@@ -320,7 +322,7 @@ Every command registered in build 02416, grouped as `help` groups them. *Registe
 | `session` | Session status and lifecycle tests | `session <subcommand>` | Registered |
 | `sessions` | List lifecycle sessions | `sessions [presentation]` | Registered |
 | `sh` | Linux console alias | `sh [start\|exec <cmd>\|stop\|status]` | Registered |
-| `smp` | Symmetric multiprocessing | `smp status \| smp selftest \| smp timers \| smp idle \| smp start \| smp test \| smp context-cert [short\|scale\|full] \| smp inject-mask <cpu>` | Registered |
+| `smp` | Symmetric multiprocessing | `smp status \| smp selftest \| smp timers \| smp idle \| smp start \| smp test \| smp context-cert [short\|scale\|full] \| smp inject-mask <cpu>` | Verified |
 | `start` | ZEROcore start alias | `start <component>` | Registered |
 | `status` | ZEROcore status alias | `status [component]` | Registered |
 | `sysinfo` | System summary | `sysinfo` | Registered |

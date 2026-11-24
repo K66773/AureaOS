@@ -41,7 +41,7 @@ AureaFS is Aurea's own file system. It is implemented in the kernel and is used 
 
 The Linux driver domain is a virtual machine that Aurea runs itself, using Intel VMX and EPT directly, without any host hypervisor. In Milestone 1 it contains Linux 6.18.49 with a small initramfs (GNU Bash 5.2, BusyBox 1.36), two emulated serial ports (the console and a control channel) and a timer. It starts automatically at boot when VT-x is usable. The `bash` command connects the Aura window to its console.
 
-What it does not do yet: it gets no access to physical devices, provides no drivers to Aurea, and shares no files or network with Aurea. Its only job today is to prove that Aurea can host and control a Linux kernel.
+What it does not do yet: it gets no access to physical devices, provides no drivers to Aurea, and shares no files or network with Aurea. Its only job today is to prove that Aurea can host and control a Linux kernel. Details: [LINUX_GUEST.md](LINUX_GUEST.md).
 
 ### SoftCPU
 

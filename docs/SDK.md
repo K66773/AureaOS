@@ -114,6 +114,8 @@ Milestone 1 has no persistent storage, no USB file import and no package store, 
 
 Expected result in the Aura window:
 
+![An SDK-built program in the Aura terminal](../assets/screenshots/sdk-app.png)
+
 ```
 Aura C:/> run C:/hello.run alpha beta
 Hello from an Aurea SDK application.

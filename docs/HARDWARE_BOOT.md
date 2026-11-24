@@ -1,116 +1,157 @@
-# Booting Aurea OS on real hardware
+# Booting Aurea OS on Intel hardware
 
-**Hardware boot is experimental.** Aurea OS has its own drivers for only a small set of devices, and it has been tested on exactly one physical machine. Use QEMU unless you specifically want to try real hardware, and use a test machine you can afford to have misbehave.
+This guide goes from an empty USB drive to a GNU Bash prompt running in Aurea's VMX Linux guest on a real Intel PC.
 
-- [What has been tested](#what-has-been-tested)
-- [Requirements](#requirements)
-- [Preparing a USB drive](#preparing-a-usb-drive)
-- [Booting](#booting)
-- [What to expect](#what-to-expect)
-- [Storage safety](#storage-safety)
-- [Returning to your normal operating system](#returning-to-your-normal-operating-system)
-- [Troubleshooting](#troubleshooting)
+Hardware boot is experimental. Everything below was tested on one machine:
 
-## What has been tested
+| | |
+|---|---|
+| Machine | HP EliteBook 840 G8 |
+| CPU | Intel 11th-gen Core (Tiger Lake), 4 cores / 8 threads, VT-x with EPT and unrestricted guest |
+| Memory | 16 GB |
+| Firmware | HP UEFI, 1920×1080 GOP framebuffer |
 
-| Machine | Build | Result |
-|---|---|---|
-| HP EliteBook 840 G8 (Intel Tiger Lake, 16 GB) | 02388, 02391 | Boots to login and the desktop; keyboard works; VMX can be enabled. |
-| HP EliteBook 840 G8 | 02405 | Linux driver domain starts; Bash ready about 3 seconds after `domain linux start`. |
-| HP EliteBook 840 G8 | 02416 (this release) | **Not tested yet.** |
-| Any other machine | — | Not tested. |
+| Build | Result on that machine |
+|---|---|
+| 02388, 02391 | Boot to login and desktop; keyboard works; VMXON/VMXOFF works |
+| 02405 | Linux guest ready about 3 s after `domain linux start`; interactive Bash |
+| 02412 | Two boots with Linux autostart: VMX guest self-test passed, Linux ready about 40 s after the guest started, interactive Bash including `uname -a` |
+| 02416 (current download) | **Not tested on hardware yet.** It is 02412 plus fixes for running native programs, plus unfinished driver-domain code. |
 
-Those tests used a USB stick with a different partition layout (a 512 MiB EFI partition plus a separate partition for logs) and the same four boot files. The public image, written with `Aurea Live boot.cmd`, contains the same boot files on a single 126 MiB EFI partition. That exact layout has been booted in QEMU, not on hardware.
+Other Intel machines with VT-x and EPT should behave similarly, but none has been tested, and missing drivers or firmware differences can stop the boot. AMD processors are not supported: the guest code uses Intel VMX only.
 
-## Requirements
+## A. Requirements
 
-- **x86-64 PC with UEFI firmware.** Legacy BIOS / CSM boot is not supported.
-- **Secure Boot disabled.** The Aurea boot loader and kernel are unsigned.
-- **A USB drive of 256 MB or more** that you are prepared to erase. The image is 128 MiB; Aurea writes nothing to the drive while running.
-- **For `bash`:** an Intel CPU with VT-x and EPT, with virtualization enabled in the firmware settings. AMD processors are not supported by the Linux driver domain.
-- **A keyboard that works without special drivers.** See [What to expect](#what-to-expect).
+- **Intel x86-64 CPU** with VT-x. The Linux guest needs these VMX features, which Aurea checks at boot:
+  - EPT and unrestricted guest (secondary processor controls);
+  - the VMX-preemption timer, external-interrupt exiting and acknowledge-interrupt-on-exit;
+  - interrupt-window exiting.
 
-## Preparing a USB drive
+  Most Intel Core processors of the last decade have them, but I have only verified the Tiger Lake machine above.
+- **UEFI firmware.** Legacy BIOS/CSM boot is not supported.
+- **Secure Boot off.** The Aurea boot loader and kernel are unsigned.
+- **Intel Virtualization Technology enabled** in the firmware, and locked as enabled. Firmware normally does both when you turn the option on.
+- **Memory:** 1 GB is enough for Aurea and the 128 MiB Linux guest; the test machine had 16 GB.
+- **A USB drive** of 256 MB or more that may be erased. The image is 128 MiB.
+- **A keyboard** that works without special drivers: the built-in laptop keyboard (PS/2-compatible) or a USB keyboard.
+- **A USB mouse.** Laptop touchpads (I2C-HID) do not work yet.
 
-### On Windows: `Aurea Live boot.cmd`
+## B. Download
 
-1. Put `Aurea Live boot.cmd`, `aurea-live-boot.ps1`, the `.img` file and `SHA256SUMS.txt` in one folder.
-2. Plug in the USB drive.
-3. Double-click `Aurea Live boot.cmd` and accept the Windows elevation prompt. Writing a raw disk requires administrator rights.
-4. The tool lists the USB drives it is willing to write, with model, size, serial number and drive letters. Disks on other buses (SATA, NVMe, and so on), system and boot disks, disks holding Windows or a page file, read-only and offline disks, disks smaller than the image and disks larger than 2 TB are never offered.
-5. Enter the disk number, then type `ERASE <number>` exactly to confirm.
-6. The tool removes the drive's partitions, writes the image, reads it back and compares the SHA-256. It reports success only if the read-back matches.
+From the [Milestone 1 release](../../../releases/tag/milestone-1):
 
-To see which drives would be offered without writing anything, run `"Aurea Live boot.cmd" -ListOnly`.
+- `AureaOS-Milestone1-build02416.img`: the boot image
+- `AureaOS-Milestone1-tools.zip`: `Aurea Live boot.cmd` and `Aurea Live VM.cmd`
+- `SHA256SUMS.txt`: checksums
 
-### On Linux
+Extract the tools and put the image and `SHA256SUMS.txt` in the same folder.
+
+## C. Prepare the USB drive
+
+On Windows:
+
+1. Plug in the USB drive.
+2. Run `Aurea Live boot.cmd` and accept the administrator prompt.
+3. The tool checks the image against `SHA256SUMS.txt`, then lists only USB-attached disks. System and boot disks, disks holding Windows or a page file, read-only, offline, too small and larger than 2 TB disks are never offered.
+4. Enter the disk number, then type `ERASE <number>` exactly.
+5. The tool removes the drive's partitions, writes the image, reads it back and compares the SHA-256. It reports success only if they match.
+
+`"Aurea Live boot.cmd" -ListOnly` shows the eligible drives without writing anything.
+
+On Linux:
 
 ```sh
 sha256sum -c SHA256SUMS.txt --ignore-missing
-lsblk -o NAME,SIZE,MODEL,TRAN,MOUNTPOINTS      # identify the USB drive, e.g. /dev/sdX
+lsblk -o NAME,SIZE,MODEL,TRAN          # find the USB drive, e.g. /dev/sdX
 sudo dd if=AureaOS-Milestone1-build02416.img of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
-Double-check the device name. `dd` overwrites whatever you point it at.
+The image has a GPT sized for 128 MiB, so on a larger drive the backup GPT header is not at the end of the disk. UEFI firmware boots such drives normally.
 
-### Note on the partition table
+## D. Configure the firmware
 
-The image carries a GPT sized for 128 MiB. On a larger drive, the backup GPT header is therefore not at the end of the disk. UEFI firmware boots such drives normally, and Windows and Linux tools may offer to repair the table. This is expected for raw-written images.
+Open the firmware setup (on HP: Esc, then F10) and:
 
-## Booting
+1. Disable **Secure Boot**.
+2. Enable **Intel Virtualization Technology (VT-x)**. If there is a separate VT-d option, it does not matter for Milestone 1.
+3. Keep **UEFI** boot mode; disable Legacy/CSM if it is on.
+4. Save and power off.
 
-1. Shut the computer down completely.
-2. Plug in the USB drive.
-3. Open the firmware boot menu. Common keys are F9 (HP), F12 (Dell, Lenovo), F11 (MSI), F8 (ASUS) and Esc; check your manufacturer's documentation.
-4. Choose the USB drive's **UEFI** entry.
-5. A short boot menu appears, then verbose boot output, then the login screen. Log in as `Aura` with password `root`.
+## E. Boot Aurea
 
-## What to expect
+1. Plug in the USB drive and open the boot menu (HP: F9; Dell and Lenovo: F12; ASUS: F8; MSI: F11).
+2. Choose the USB drive's UEFI entry.
+3. A short boot menu appears, then the kernel's boot screen with its log and progress bars. On the test machine the login screen came up about 30 seconds after the kernel started.
+4. Log in as `aura` with password `root`.
+5. Open the Aura terminal from the taskbar (`>_`).
 
-| Area | Milestone 1 |
+## F. Start the Linux guest
+
+The release image sets `linux.autostart=true`, so the guest starts by itself during boot. Its state:
+
+```
+Aura C:/> domain linux status
+```
+
+Then open the shell:
+
+```
+Aura C:/> bash
+```
+
+If Linux is still starting, `bash` prints `Linux is still starting...` and attaches when the shell is ready. On the test machine, with autostart, that took about 40 seconds from the guest's start. If autostart is turned off or the guest was stopped, start it by hand:
+
+```
+Aura C:/> domain linux start
+```
+
+If VMX is missing or disabled, `bash` reports why, for example `start failed status=-5 ... note=bounded-host-irq-controls-unavailable`.
+
+## G. Verify Linux
+
+```
+root@linux:~# uname -a
+Linux (none) 6.18.49 #2 SMP PREEMPT_DYNAMIC Wed Oct  7 17:32:56 CEST 2026 x86_64 GNU/Linux
+root@linux:~# bash --version
+GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)
+root@linux:~# whoami
+root
+```
+
+The `uname -a` line is the real output from the HP run of build 02412; `bash --version` is from QEMU/KVM. The guest has Bash plus the BusyBox tools (`ls`, `cat`, `ps`, `mkdir` and so on). It has no network tools, no package manager, no disk and no access to Aurea's C: drive. Files you create live in the guest's memory.
+
+## H. Return to Aura
+
+| Key or command | Effect |
 |---|---|
-| Graphics | The UEFI framebuffer at the resolution the firmware chooses. No GPU driver, no acceleration, no resolution changes. |
-| Keyboard | PS/2 keyboards, including the PS/2-compatible keyboard of most laptops, and USB HID keyboards on xHCI and UHCI controllers. German QWERTZ by default. |
-| Pointer | USB mice. **Laptop touchpads do not work**: they are usually I2C-HID devices, and that driver is unfinished. Bring a USB mouse. |
-| Storage | USB mass storage (Bulk-Only Transport, 512-byte sectors) is detected. NVMe controllers are detected but not read. AHCI support exists but has not been verified on hardware for this release. Nothing on the USB drive or internal disks is mounted as a drive letter; C: lives in memory. |
-| Network | Intel e1000-family adapters only. Wi-Fi is not supported. |
-| Audio | AC97 and Intel HD Audio drivers exist but were not tested on hardware for this release. |
-| Bluetooth, webcams, card readers | Not supported. |
-| Power | `power shutdown` and `power reboot` use ACPI. Sleep and battery status are not supported. |
-| Linux driver domain | Starts automatically if VT-x and EPT are available. It does not yet drive any hardware. |
+| `exit` or Ctrl+D | Ends Bash and returns to Aura. The guest starts a fresh shell for the next `bash`. |
+| Ctrl+] or Ctrl+Shift+J | Returns to Aura and leaves Bash running. `bash` reattaches to the same shell. |
+| Ctrl+C | Copies if text is selected, otherwise interrupts the running Linux program. |
 
-Missing drivers are expected, not bugs. Providing drivers through the Linux driver domain is the focus of the next milestone.
+## I. Shut down
 
-## Storage safety
+```
+Aura C:/> power shutdown
+```
 
-I cannot guarantee that Aurea OS will never modify an internal disk. What I can tell you:
+If the machine does not power off, hold the power button. Remove the USB drive and the computer boots its normal operating system again; Aurea changes no firmware settings or boot entries. You can turn Secure Boot back on.
 
-- The shipped configuration sets `storage.internal_readonly=true`, which makes Aurea register internal block devices as read-only.
-- In Milestone 1, Aurea does not mount any disk file system from internal storage; the C: drive is held in memory.
-- NVMe drives are only detected, not read or written.
-- Aurea has not been audited for storage safety, and bugs are likely.
+To reuse the USB drive, delete its partitions in Windows Disk Management (or `diskpart`, `select disk N`, `clean`) and create a new volume.
 
-So: **back up anything important before booting Aurea on a machine**, prefer a dedicated test computer, and do not change `storage.internal_readonly` unless you know exactly what you are doing.
+## J. Troubleshooting
 
-## Returning to your normal operating system
-
-1. In Aura, run `power shutdown`. If the machine does not turn off, hold the power button.
-2. Remove the USB drive.
-3. Start the computer normally.
-
-Aurea does not change firmware settings or boot entries. If you disabled Secure Boot for Aurea, you can enable it again.
-
-To use the USB drive for files again, delete its partitions in Windows Disk Management (or with `diskpart` → `select disk N` → `clean`) and create a new volume. On Linux, use `wipefs -a /dev/sdX` and then create a new partition table.
-
-## Troubleshooting
-
-| Symptom | What to try |
+| Problem | What to check |
 |---|---|
-| The USB drive is not in the boot menu | Enable USB boot in the firmware, disable CSM / legacy mode, and make sure you choose the UEFI entry. |
-| "Secure Boot violation" or similar | Disable Secure Boot in the firmware settings. |
-| The screen stays black after selecting the drive | Wait a minute: verbose boot can be slow on some framebuffers. If nothing appears, the firmware's graphics output is probably not usable by Aurea. |
-| Boot stops with text output and does not reach the login screen | Note the last lines on the screen and report them. Hardware initialization failed on that machine. |
-| The keyboard does not respond | Try a USB keyboard in a different port, or the internal keyboard if you used an external one. |
-| No mouse pointer movement | Touchpads are not supported. Use a USB mouse. |
-| `bash` reports that VMX is unavailable | Enable Intel Virtualization Technology (VT-x) in the firmware. AMD systems are not supported. |
-| A red "critical system error" screen | A kernel fault. Note the error name and RIP shown, then restart. |
+| `bash` says VMX is unavailable | Intel Virtualization Technology is off in the firmware, or the CPU lacks one of the features in section A. `hwdiag` in Aura prints the VMX capability checks; `hwdiag vmxon` also tries VMXON and VMXOFF. |
+| Virtualization option is enabled but VMX still fails | Some firmware needs a full power-off, not a restart, after changing it. |
+| AMD processor | Not supported. Aurea itself may boot, but the Linux guest cannot start. |
+| Linux does not become ready | `domain linux status` shows the guest's state. Try `domain linux stop`, then `domain linux start`. |
+| Bash prompt does not appear after `bash` | Wait for the `Linux is still starting...` phase to finish, or detach with Ctrl+] and run `bash` again. |
+| Screen stays black after choosing the USB drive | Secure Boot may still be on, or the firmware's graphics output is not usable by Aurea. |
+| Boot stops in the log screen | A driver failed on this hardware. Note the last lines and report them. |
+| Keyboard does not respond | Try the built-in keyboard, or a USB keyboard in another port. |
+| No mouse pointer movement | Touchpads are not supported yet; use a USB mouse. |
+| Internal disks | Aurea mounts nothing from internal disks. The shipped configuration marks them read-only (`storage.internal_readonly=true`), and NVMe drives are only detected. I still recommend a test machine and a backup. |
+| Wi-Fi, sound, Bluetooth | Not supported on hardware in Milestone 1. |
+
+Logs are not kept on the USB drive in this image. If you report a problem, a photo of the screen with the last messages helps most.
