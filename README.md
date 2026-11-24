@@ -53,7 +53,7 @@ Aurea OS is not a replacement for Windows, Linux or macOS, and Milestone 1 does 
 | Platform | x86-64, UEFI only |
 | Recommended environment | QEMU on Windows or Linux |
 | Real hardware | Experimental; see [docs/HARDWARE_BOOT.md](docs/HARDWARE_BOOT.md) |
-| Development login | user `Aura`, password `root` |
+| Development login | user `aura`, password `root` |
 
 This repository holds the public documentation, the launch and USB tools, and the SDK. The operating system itself is distributed as a disk image on the [release page](../../releases). The Aurea OS source code is not public.
 
