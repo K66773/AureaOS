@@ -1,17 +1,23 @@
 # Third-party notices
 
-Aurea OS is my own work, but the Milestone 1 image contains software and fonts written by others. These components keep their own licences. They are not Aurea code, and their licences are not changed by being included here.
+Aurea OS is my own work, but the Milestone 1.1 image contains software, fonts and game data written by others. These components keep their own licences. They are not Aurea code, and their licences are not changed by being included here.
 
-The full licence texts are in `THIRD_PARTY_NOTICES.txt` on the [Milestone 1 release page](../../releases/tag/milestone-1).
+The full licence texts are in `THIRD_PARTY_NOTICES.txt` on the [Milestone 1.1 release page](../../releases/tag/milestone-1.1).
 
-## Components in the Milestone 1 image
+## Components in the Milestone 1.1 image
 
 ### Linux kernel 6.18.49
 
-- **Where:** two guest kernels embedded in the Aurea kernel image: the Linux driver domain, and a second build (`6.18.49-aureafs1`, with FUSE built in) for the experimental file-system guest.
+- **Where:** two guest kernels embedded in the Aurea kernel image: the Linux driver domain (with its loadable modules in the guest's initramfs), and a second build (`6.18.49-aureafs1`, with FUSE built in) for the experimental file-system guest.
 - **Licence:** GPL-2.0-only, with the Linux syscall note.
 - **Copyright:** Linus Torvalds and the Linux kernel contributors.
 - **Build:** unmodified upstream source from kernel.org (`linux-6.18.49.tar.xz`, SHA-256 `ae826f33…a28191`). Both kernels use their own configuration; `-aureafs1` is set through `CONFIG_LOCALVERSION`. Both `.config` files are part of the source archive below.
+
+### Aurea guest modules and driver service
+
+- **Where:** `aurea_driver_net.ko`, `aurea_driver_i2c.ko` and `/bin/aurea-driver-service` in the driver domain's initramfs.
+- **Licence:** GPL-2.0-only.
+- **Copyright:** 66773. These are my code; they are listed here because they are Linux modules and a Linux user-space program, and their source is in the archive below.
 
 ### GNU Bash 5.2.21
 
@@ -29,10 +35,29 @@ The full licence texts are in `THIRD_PARTY_NOTICES.txt` on the [Milestone 1 rele
 
 ### GNU C Library 2.39
 
-- **Where:** statically linked into Bash, BusyBox and two small Aurea helper programs in the initramfs (`aurea-console-session`, `aurea-domain-agent`).
+- **Where:** statically linked into Bash, BusyBox and three Aurea helper programs in the initramfs (`aurea-console-session`, `aurea-domain-agent`, `aurea-driver-service`).
 - **Licence:** LGPL-2.1-or-later, with additional permissive notices for some parts.
 - **Copyright:** Free Software Foundation, Inc. and others.
-- **Versions:** Ubuntu `glibc` 2.39-0ubuntu8 (in Bash), 2.39-0ubuntu8.2 (in BusyBox) and 2.39-0ubuntu8.12 (in the two helpers).
+- **Versions:** Ubuntu `glibc` 2.39-0ubuntu8 (in Bash), 2.39-0ubuntu8.2 (in BusyBox) and 2.39-0ubuntu8.12 (in the three helpers).
+
+### id Tech 1 engine (DOOM source release)
+
+- **Where:** the program in the `Freedoom.run` package (`C:\Programs\phase1\Freedoom.run` in the image).
+- **Licence:** GPL-2.0.
+- **Copyright:** id Software, Inc. (linuxdoom-1.10); the Aurea port is mine and under the same licence.
+- **Build:** ported from id Software's source release. The changes and the Aurea platform layer are in the source archive below.
+
+### Freedoom: Phase 1 0.13.0
+
+- **Where:** the game data in the `Freedoom.run` package.
+- **Licence:** BSD-3-Clause.
+- **Copyright:** Copyright © 2001-2024 Contributors to the Freedoom project.
+
+### BearSSL
+
+- **Where:** linked into the Browser and NetTest programs.
+- **Licence:** MIT.
+- **Copyright:** Copyright (c) 2016 Thomas Pornin.
 
 ### IBM Plex Sans and IBM Plex Mono
 
@@ -48,16 +73,18 @@ The full licence texts are in `THIRD_PARTY_NOTICES.txt` on the [Milestone 1 rele
 
 ## Source code for GPL and LGPL components
 
-The GNU General Public License and the GNU Lesser General Public License require that the complete corresponding source code be available to anyone who receives the binaries. For Milestone 1 it is published next to the image, on the same release page:
+The GNU General Public License and the GNU Lesser General Public License require that the complete corresponding source code be available to anyone who receives the binaries. For Milestone 1.1 it is published next to the image, on the same release page:
 
-**`AureaOS-Milestone1-third-party-source.tar`**, containing:
+**`AureaOS-Milestone1.1-third-party-source.tar`**, containing:
 
-- the Linux 6.18.49 source tarball and the two kernel configurations (driver domain and file-system guest), with the build scripts;
+- the Linux 6.18.49 source tarball and the two kernel configurations (driver domain and file-system guest);
 - the Ubuntu source packages for `bash` 5.2.21-2ubuntu4, `busybox` 1:1.36.1-6ubuntu3.1, and `glibc` 2.39-0ubuntu8, 2.39-0ubuntu8.2 and 2.39-0ubuntu8.12;
-- the source of `aurea-console-session` and `aurea-domain-agent`, with the commands used to build and link them, so they can be relinked against a modified C library;
-- the initramfs layout and init script.
+- the source of the Aurea guest modules, the driver service and the two console helpers, with the commands used to build, sign and link them and to assemble the initramfs;
+- the id Tech 1 engine port: the upstream source, the scripts that produce the port, the Aurea platform layer, the SDK runtime it links (MIT) and a build script.
 
-If anything is missing from that archive, open an issue in this repository and I will provide it.
+The Milestone 1 image and its source archive remain on the [Milestone 1 release page](../../releases/tag/milestone-1).
+
+If anything is missing from an archive, open an issue in this repository and I will provide it.
 
 ## Not included
 

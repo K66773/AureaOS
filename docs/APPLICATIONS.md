@@ -2,6 +2,8 @@
 
 This page describes how programs get into Aurea OS Milestone 1 and how they are started. The procedure is a developer workflow: there is no installer or store, and nothing persists across a restart.
 
+> **Milestone 1.1:** this page was written for Milestone 1 (build 02416) and has not been fully rechecked against build 02450. Build 02450 also contains preinstalled programs in `C:\Programs` (Browser, Notepad, Snake Arena) and a Freedoom package that opens the package installer; `http get` must write into your user folder, such as `C:/Users/Aura`. For what changed, see the [README](../README.md), [LINUX_GUEST.md](LINUX_GUEST.md) and [LIMITATIONS.md](LIMITATIONS.md).
+
 ## Status
 
 | Step | Status in build 02416 |

@@ -2,6 +2,8 @@
 
 This page describes how Aurea OS is built today (Milestone 1, build 02416) and where it is meant to go. The two are kept apart on purpose: everything under [Intended architecture](#intended-architecture) is planned unless it says otherwise.
 
+> **Milestone 1.1:** this page was written for Milestone 1 (build 02416) and has not been fully rechecked against build 02450. The Linux driver domain and SoftCPU sections below are updated. For what changed, see the [README](../README.md), [LINUX_GUEST.md](LINUX_GUEST.md) and [LIMITATIONS.md](LIMITATIONS.md).
+
 ## Milestone 1
 
 ![Milestone 1 architecture](../assets/diagrams/architecture-milestone1.svg)
@@ -39,13 +41,13 @@ AureaFS is Aurea's own file system. It is implemented in the kernel and is used 
 
 ### Linux driver domain
 
-The Linux driver domain is a virtual machine that Aurea runs itself, using Intel VMX and EPT directly, without any host hypervisor. In Milestone 1 it contains Linux 6.18.49 with a small initramfs (GNU Bash 5.2, BusyBox 1.36), two emulated serial ports (the console and a control channel) and a timer. It starts automatically at boot when VT-x is usable. The `bash` command connects the Aura window to its console.
+The Linux driver domain is a virtual machine that Aurea runs itself, using Intel VMX and EPT directly, without any host hypervisor, or SoftCPU where VMX is not usable. In Milestone 1 it contained Linux 6.18.49 with a small initramfs (GNU Bash 5.2, BusyBox 1.36), two emulated serial ports (the console and a control channel) and a timer. It starts automatically at boot when VT-x is usable. The `bash` command connects the Aura window to its console.
 
-What it does not do yet: it gets no access to physical devices, provides no drivers to Aurea, and shares no files or network with Aurea. Its only job today is to prove that Aurea can host and control a Linux kernel. Details: [LINUX_GUEST.md](LINUX_GUEST.md).
+Since Milestone 1.1 it also drives one device for Aurea: with an Intel IOMMU present, Zero Core assigns the network card to the guest, the Linux driver runs it, and frames cross to Aurea's own network stack over a driver channel. It still shares no files with Aurea, and no other device class goes through it yet. Details: [LINUX_GUEST.md](LINUX_GUEST.md).
 
 ### SoftCPU
 
-A software x86-64 interpreter used in development builds for experiments on hosts without usable VT-x. It is not part of the release build. See [SOFTCPU.md](SOFTCPU.md).
+A binary translator in the kernel that runs the Linux guest when VT-x is not usable, for example under QEMU with WHPX. Part of the release image since 1.1. See [SOFTCPU.md](SOFTCPU.md).
 
 ## Intended architecture
 

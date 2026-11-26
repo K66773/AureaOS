@@ -7,6 +7,8 @@ This reference covers build 02416. Status values:
 - **Verified**: I ran the command in the release build and it behaved as described.
 - **Registered**: the command is registered and its syntax is taken from the command registry, but it was not individually tested for this release.
 
+> **Milestone 1.1:** this page was written for Milestone 1 (build 02416) and has not been fully rechecked against build 02450. The `bash` row is updated. For what changed, see the [README](../README.md), [LINUX_GUEST.md](LINUX_GUEST.md) and [LIMITATIONS.md](LIMITATIONS.md).
+
 ## Basics
 
 - `help` lists the command categories. `help <category>` lists a category, `help command <name>` shows one command, and `commands --all` lists everything.
@@ -74,7 +76,7 @@ Bash needs VT-x with EPT and is not available in Windows QEMU.
 | `errorcenter` | Error Center | `errorcenter` | Verified |  |
 | `devmgr` | Device Manager | `devmgr` | Registered |  |
 | `terminal` | Start terminal | `terminal` | Registered |  |
-| `bash` | Linux shell | `bash` | Verified | Works under QEMU/KVM with nested VMX; fails with a clear message under WHPX. |
+| `bash` | Linux shell | `bash` | Verified | Build 02450: works under QEMU/KVM with nested VMX, and under WHPX on SoftCPU. |
 | `linux` | Linux console | `linux [start\|exec <cmd>\|stop\|status]` | Registered |  |
 | `net` | Network stack | `net list\|status\|health\|wireless\|dhcp renew` | Verified | `net status` verified. |
 | `ip` | IP addresses and routes | `ip addr\|route` | Verified | `ip addr` verified. |

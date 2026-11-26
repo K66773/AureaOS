@@ -4,6 +4,8 @@ The SDK in [`sdk/`](../sdk) is the public interface for writing native Aurea OS 
 
 > **Status: Partial.** The SDK builds, and SDK-built console programs run in the release image: in my tests they received their arguments, printed to the Aura window and exited cleanly, repeatedly in one session. Only the console path has been exercised from an SDK program; windows, files, sockets and the clipboard are implemented in the kernel but untested from the SDK. Treat it as an early interface that will change.
 
+> **Milestone 1.1:** this page was written for Milestone 1 (build 02416) and has not been fully rechecked against build 02450. The SDK files in this repository are unchanged since Milestone 1. For what changed, see the [README](../README.md), [LINUX_GUEST.md](LINUX_GUEST.md) and [LIMITATIONS.md](LIMITATIONS.md).
+
 - [What is in the SDK](#what-is-in-the-sdk)
 - [Required tools](#required-tools)
 - [A first application](#a-first-application)

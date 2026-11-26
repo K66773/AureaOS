@@ -8,6 +8,10 @@
     snapshot mode: nothing the virtual machine writes reaches the image file.
     No host disk or USB device is attached.
 
+    The virtual machine has an Intel IOMMU and an e1000 network adapter.
+    Aurea assigns the adapter to its Linux driver domain only when an IOMMU
+    is present, so the IOMMU is what lets Linux drive the card.
+
 .PARAMETER Image
     Path to the Aurea OS .img file. By default the script looks for
     AureaOS-*.img next to itself and in its parent folder.
@@ -166,16 +170,17 @@ if (-not (Test-Path -LiteralPath $vars)) { Copy-Item -LiteralPath $fw.Vars -Dest
 $serialLog = Join-Path $logDir ("serial-{0}.log" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 
 $accelArgs = switch ($Accel) {
-    'whpx' { @('-accel', 'whpx') }
+    'whpx' { @('-accel', 'whpx,kernel-irqchip=off') }
     'tcg' { @('-accel', 'tcg') }
-    default { @('-accel', 'whpx', '-accel', 'tcg') }
+    default { @('-accel', 'whpx,kernel-irqchip=off', '-accel', 'tcg') }
 }
 
 # QEMU splits -drive options on commas; double them in paths.
 function Q([string]$p) { $p.Replace(',', ',,') }
 
-$argv = @('-name', 'Aurea OS', '-machine', 'pc,usb=off') + $accelArgs + @(
-    '-cpu', 'qemu64',
+$argv = @('-name', 'Aurea OS', '-machine', 'q35') + $accelArgs + @(
+    '-cpu', 'qemu64,+ssse3,+sse4.1,+sse4.2,+popcnt',
+    '-device', 'intel-iommu,intremap=off',
     '-smp', "$Cpus",
     '-m', "$($MemoryMB)M",
     '-device', 'virtio-vga,edid=on,xres=1920,yres=1080',
